@@ -18,5 +18,12 @@ build-and-run: build run
 	@echo "==> Build completed. Running ${APP_NAME}..."
 
 .PHONY: migrate
+
 migrate:
 	migrate -path migrations -database "postgres://localhost:5432/mywebapp?sslmode=disable&user=postgres&password=postgres" up
+
+
+.PHONY: migrate-down
+
+migrate-down:
+	migrate -path migrations -database "postgres://localhost:5432/mywebapp?sslmode=disable&user=postgres&password=postgres" down
