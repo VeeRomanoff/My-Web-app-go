@@ -1,5 +1,0 @@
-server_port = ":8080"
-logger_level = "debug"
-
-[storage]
-database_uri = "host=localhost port=5432 user=postgres password=postgres dbname=mywebapp sslmode=disable"
