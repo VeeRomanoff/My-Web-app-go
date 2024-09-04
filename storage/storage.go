@@ -36,6 +36,7 @@ func (s *Storage) Close() {
 }
 
 // Public Repo for Article
+// (ex. s.Article().FindById())
 func (s *Storage) Article() *ArticleRepository {
 	if s.articleRepository != nil {
 		return s.articleRepository
@@ -47,6 +48,7 @@ func (s *Storage) Article() *ArticleRepository {
 }
 
 // Public Repo for User
+// (ex. s.User().FindById())
 func (s *Storage) User() *UserRepository {
 	if s.articleRepository != nil {
 		return s.userRepository
