@@ -7,6 +7,10 @@ import (
 	"net/http"
 )
 
+var (
+	prefix string = "api/v1"
+)
+
 type MyWebApp struct {
 	config  *Config
 	router  *mux.Router
@@ -22,38 +26,40 @@ func NewMyWebApp(config *Config) *MyWebApp {
 	}
 }
 
-func (a *MyWebApp) Start() error {
-	if err := a.configureLoggerField(); err != nil {
+func (app *MyWebApp) Start() error {
+	if err := app.configureLoggerField(); err != nil {
 		return err
 	}
 
-	a.configureRouterField()
+	app.configureRouterField()
 
-	return http.ListenAndServe(a.config.Port, a.router)
+	return http.ListenAndServe(app.config.Port, app.router)
 }
 
-func (a *MyWebApp) configureLoggerField() error {
-	level, err := logrus.ParseLevel(a.config.Logger)
+func (app *MyWebApp) configureLoggerField() error {
+	level, err := logrus.ParseLevel(app.config.Logger)
 	if err != nil {
 		return err
 	}
-	a.logger.SetLevel(level)
+	app.logger.SetLevel(level)
 	return nil
 }
 
-func (a *MyWebApp) configureRouterField() {
-	a.router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Hello World"))
-	})
+func (app *MyWebApp) configureRouterField() {
+	app.router.HandleFunc(prefix+"/articles", app.getAllArticles).Methods("GET")
+	app.router.HandleFunc(prefix+"/articles/{id}", app.GetArticleById).Methods("GET")
+	app.router.HandleFunc(prefix+"/articles", app.CreateArticle).Methods("POST")
+	app.router.HandleFunc(prefix+"/articles/{id}", app.UpdateArticleById).Methods("PUT")
+	app.router.HandleFunc(prefix+"/articles/{id}", app.DeleteArticleById).Methods("DELETE")
 }
 
-func (a *MyWebApp) configureStorageField() error {
-	storage := a.storage.New(a.config.StorageConfig)
-	a.logger.Info("trying to open db storage")
+func (app *MyWebApp) configureStorageField() error {
+	storage := app.storage.New(app.config.StorageConfig)
+	app.logger.Info("trying to open db storage")
 	err := storage.Open()
 	if err != nil {
 		return err
 	}
-	a.storage = storage
+	app.storage = storage
 	return nil
 }

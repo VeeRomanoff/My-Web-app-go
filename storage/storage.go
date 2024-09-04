@@ -50,7 +50,7 @@ func (s *Storage) Article() *ArticleRepository {
 // Public Repo for User
 // (ex. s.User().FindById())
 func (s *Storage) User() *UserRepository {
-	if s.articleRepository != nil {
+	if s.userRepository != nil {
 		return s.userRepository
 	}
 	s.userRepository = &UserRepository{
