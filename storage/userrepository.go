@@ -37,7 +37,10 @@ func (ur *UserRepository) SelectAll() ([]*models.User, error) {
 }
 
 func (ur *UserRepository) Create(u *models.User) (*models.User, error) {
-	query := fmt.Sprintf("INSERT INTO %s (login, passsword) VALUES ($1, $2) RETURNING id", usersTable)
+	if ur.storage.db == nil {
+		return nil, fmt.Errorf("database connection is nil")
+	}
+	query := fmt.Sprintf("INSERT INTO %s (login, password) VALUES ($1, $2) RETURNING id", usersTable)
 	err := ur.storage.db.QueryRow(query, u.Login, u.Password).Scan(&u.ID)
 	if err != nil {
 		return nil, err

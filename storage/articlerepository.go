@@ -1,6 +1,7 @@
 package storage
 
 import (
+	"context"
 	"fmt"
 	"github.com/VeeRomanoff/mywebapp/internal/mywebapp/models"
 	"log"
@@ -17,10 +18,10 @@ var (
 
 func (ar *ArticleRepository) Create(a *models.Article) (*models.Article, error) {
 	query := fmt.Sprintf("INSERT INTO %s (title, author, content) VALUES ($1, $2, $3) RETURNING id", tableArticle)
-	if err := ar.storage.db.QueryRow(query, a.Title, a.Author, a.Content).Scan(&a.ID); err != nil {
+	err := ar.storage.db.QueryRow(query, a.Title, a.Author, a.Content).Scan(&a.ID)
+	if err != nil {
 		return nil, err
 	}
-
 	return a, nil
 }
 
@@ -43,7 +44,7 @@ func (ar *ArticleRepository) FindArticleById(id int) (*models.Article, bool, err
 	return articleFound, found, nil
 }
 
-func (ar *ArticleRepository) SelectAll() ([]*models.Article, error) {
+func (ar *ArticleRepository) SelectAll(ctx context.Context) ([]*models.Article, error) {
 	query := fmt.Sprintf("SELECT * FROM %s", tableArticle)
 	rows, err := ar.storage.db.Query(query)
 	if err != nil {

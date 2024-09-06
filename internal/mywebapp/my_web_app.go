@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	prefix string = "api/v1"
+	prefix string = "/api/v1"
 )
 
 type MyWebApp struct {
@@ -33,6 +33,10 @@ func (app *MyWebApp) Start() error {
 
 	app.configureRouterField()
 
+	if err := app.configureStorageField(); err != nil {
+		return err
+	}
+
 	return http.ListenAndServe(app.config.Port, app.router)
 }
 
@@ -46,11 +50,12 @@ func (app *MyWebApp) configureLoggerField() error {
 }
 
 func (app *MyWebApp) configureRouterField() {
-	app.router.HandleFunc(prefix+"/articles", app.getAllArticles).Methods("GET")
-	app.router.HandleFunc(prefix+"/articles/{id}", app.GetArticleById).Methods("GET")
+	app.router.HandleFunc(prefix+"/articles", app.GetAllArticles).Methods("GET")
+	//app.router.HandleFunc(prefix+"/articles/{id}", app.GetArticleById).Methods("GET")
 	app.router.HandleFunc(prefix+"/articles", app.CreateArticle).Methods("POST")
-	app.router.HandleFunc(prefix+"/articles/{id}", app.UpdateArticleById).Methods("PUT")
-	app.router.HandleFunc(prefix+"/articles/{id}", app.DeleteArticleById).Methods("DELETE")
+	app.router.HandleFunc(prefix+"/user", app.CreateUser).Methods("POST")
+	//app.router.HandleFunc(prefix+"/articles/{id}", app.UpdateArticleById).Methods("PUT")
+	//app.router.HandleFunc(prefix+"/articles/{id}", app.DeleteArticleById).Methods("DELETE")
 }
 
 func (app *MyWebApp) configureStorageField() error {
@@ -58,8 +63,10 @@ func (app *MyWebApp) configureStorageField() error {
 	app.logger.Info("trying to open db storage")
 	err := storage.Open()
 	if err != nil {
+		app.logger.Info("couldnt open db storage")
 		return err
 	}
+	app.logger.Info("opened db storage")
 	app.storage = storage
 	return nil
 }
