@@ -65,6 +65,23 @@ func (ur *UserRepository) FindUserById(id int) (*models.User, bool, error) {
 	return userFound, found, nil
 }
 
+func (ur *UserRepository) FindUserByLogin(login string) (*models.User, bool, error) {
+	users, err := ur.SelectAll()
+	var found bool
+	if err != nil {
+		return nil, false, err
+	}
+	var userFound *models.User
+	for _, u := range users {
+		if u.Login == login {
+			userFound = u
+			found = true
+			break
+		}
+	}
+	return userFound, found, nil
+}
+
 func (ur *UserRepository) DeleteUserById(id int) (*models.User, error) {
 	user, exist, err := ur.FindUserById(id)
 	if err != nil {
@@ -80,7 +97,7 @@ func (ur *UserRepository) DeleteUserById(id int) (*models.User, error) {
 	return user, nil
 }
 
-func (ur *UserRepository) UpdateBookById(id int, u *models.User) (*models.User, error) {
+func (ur *UserRepository) UpdateUserById(id int, u *models.User) (*models.User, error) {
 	_, exist, err := ur.FindUserById(id)
 	if err != nil {
 		return nil, err

@@ -1,7 +1,6 @@
 package storage
 
 import (
-	"context"
 	"fmt"
 	"github.com/VeeRomanoff/mywebapp/internal/mywebapp/models"
 	"log"
@@ -13,11 +12,11 @@ type ArticleRepository struct {
 }
 
 var (
-	tableArticle string = "articles"
+	articleTable string = "articles"
 )
 
 func (ar *ArticleRepository) Create(a *models.Article) (*models.Article, error) {
-	query := fmt.Sprintf("INSERT INTO %s (title, author, content) VALUES ($1, $2, $3) RETURNING id", tableArticle)
+	query := fmt.Sprintf("INSERT INTO %s (title, author, content) VALUES ($1, $2, $3) RETURNING id", articleTable)
 	err := ar.storage.db.QueryRow(query, a.Title, a.Author, a.Content).Scan(&a.ID)
 	if err != nil {
 		return nil, err
@@ -44,8 +43,8 @@ func (ar *ArticleRepository) FindArticleById(id int) (*models.Article, bool, err
 	return articleFound, found, nil
 }
 
-func (ar *ArticleRepository) SelectAll(ctx context.Context) ([]*models.Article, error) {
-	query := fmt.Sprintf("SELECT * FROM %s", tableArticle)
+func (ar *ArticleRepository) SelectAll() ([]*models.Article, error) {
+	query := fmt.Sprintf("SELECT * FROM %s", articleTable)
 	rows, err := ar.storage.db.Query(query)
 	if err != nil {
 		return nil, err
@@ -67,13 +66,28 @@ func (ar *ArticleRepository) SelectAll(ctx context.Context) ([]*models.Article, 
 	return articles, nil
 }
 
+func (ar *ArticleRepository) UpdateArticleById(id int, a *models.Article) (*models.Article, error) {
+	_, exist, err := ar.FindArticleById(id)
+	if err != nil {
+		return nil, err
+	}
+	if exist {
+		query := fmt.Sprintf("UPDATE %s SET title = $1, content = $2 WHERE id = $3", articleTable)
+		_, err = ar.storage.db.Exec(query, a.Title, a.Content, a.ID)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return a, nil
+}
+
 func (ar *ArticleRepository) DeleteById(id int) (*models.Article, error) {
 	article, ok, err := ar.FindArticleById(id)
 	if err != nil {
 		return nil, err
 	}
 	if ok {
-		query := fmt.Sprintf("DELETE FROM %s WHERE ID = $1", tableArticle)
+		query := fmt.Sprintf("DELETE FROM %s WHERE ID = $1", articleTable)
 		_, err := ar.storage.db.Exec(query, article.ID)
 		if err != nil {
 			return nil, err

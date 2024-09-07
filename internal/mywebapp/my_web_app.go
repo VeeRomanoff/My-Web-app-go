@@ -51,11 +51,11 @@ func (app *MyWebApp) configureLoggerField() error {
 
 func (app *MyWebApp) configureRouterField() {
 	app.router.HandleFunc(prefix+"/articles", app.GetAllArticles).Methods("GET")
-	//app.router.HandleFunc(prefix+"/articles/{id}", app.GetArticleById).Methods("GET")
+	app.router.HandleFunc(prefix+"/articles/{id}", app.GetArticleById).Methods("GET")
 	app.router.HandleFunc(prefix+"/articles", app.CreateArticle).Methods("POST")
 	app.router.HandleFunc(prefix+"/user", app.CreateUser).Methods("POST")
-	//app.router.HandleFunc(prefix+"/articles/{id}", app.UpdateArticleById).Methods("PUT")
-	//app.router.HandleFunc(prefix+"/articles/{id}", app.DeleteArticleById).Methods("DELETE")
+	app.router.HandleFunc(prefix+"/articles/{id}", app.UpdateArticleById).Methods("PUT")
+	app.router.HandleFunc(prefix+"/articles/{id}", app.DeleteArticleById).Methods("DELETE")
 }
 
 func (app *MyWebApp) configureStorageField() error {
