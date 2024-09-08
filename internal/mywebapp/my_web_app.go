@@ -1,6 +1,7 @@
 package mywebapp
 
 import (
+	"github.com/VeeRomanoff/mywebapp/internal/mywebapp/middleware"
 	"github.com/VeeRomanoff/mywebapp/storage"
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
@@ -51,11 +52,20 @@ func (app *MyWebApp) configureLoggerField() error {
 
 func (app *MyWebApp) configureRouterField() {
 	app.router.HandleFunc(prefix+"/articles", app.GetAllArticles).Methods("GET")
-	app.router.HandleFunc(prefix+"/articles/{id}", app.GetArticleById).Methods("GET")
+
+	// before jwt
+	//app.router.HandleFunc(prefix+"/articles/{id}", app.GetArticleById).Methods("GET")
+	// now it's requiring jwt
+	app.router.Handle(prefix+"/articles"+"/{id}", middleware.JwtMiddleware.Handler(
+		http.HandlerFunc(app.GetArticleById), // USING ADAPTER JUST TO LIVE UP TO THE SIGNATURE.
+	)).Methods("GET")
+	//
 	app.router.HandleFunc(prefix+"/articles", app.CreateArticle).Methods("POST")
 	app.router.HandleFunc(prefix+"/user", app.CreateUser).Methods("POST")
 	app.router.HandleFunc(prefix+"/articles/{id}", app.UpdateArticleById).Methods("PUT")
 	app.router.HandleFunc(prefix+"/articles/{id}", app.DeleteArticleById).Methods("DELETE")
+	// Pair for auth
+	app.router.HandleFunc(prefix+"/user/auth", app.PostToAuth).Methods("POST") // user provides info, therefore method "POST"
 }
 
 func (app *MyWebApp) configureStorageField() error {
