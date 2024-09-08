@@ -12,7 +12,7 @@ build:
 
 run:
 	@echo "==> Running ${APP_NAME} with config ${CONFIG_FILE}..."
-	./${APP_NAME} {FLAG} ${CONFIG_FILE}
+	./${APP_NAME} ${FLAG} ${CONFIG_FILE}
 
 build-and-run: build run
 	@echo "==> Build completed. Running ${APP_NAME}..."
